@@ -45,7 +45,7 @@ module.exports = app => {
     }
   });
 
-  app.post("/ticket/delete", (req, res) => {
+  app.delete("/ticket/delete", (req, res) => {
     TicketModel.findById(req.body._id, (err, ticket) => {
       if (ticket) {
         ticket.remove(err => {
@@ -58,7 +58,7 @@ module.exports = app => {
     });
   });
 
-  app.post("/ticket/update", (req, res) => {
+  app.put("/ticket/update", (req, res) => {
     TicketModel.findOne({ name: req.body.name }, (err, ticket) => {
       if (ticket) {
         ticket.status = req.body.status;
