@@ -46,7 +46,7 @@ module.exports = app => {
   });
 
   app.delete("/ticket/delete", (req, res) => {
-    TicketModel.findById(req.body._id, (err, ticket) => {
+    TicketModel.findById(req.body.id, (err, ticket) => {
       if (ticket) {
         ticket.remove(err => {
           if (err) return res.send(err);
