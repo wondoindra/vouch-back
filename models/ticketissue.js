@@ -4,7 +4,6 @@ const Schema = mongoose.Schema;
 const Ticketschema = new Schema({
   name: String,
   status: String,
-  logs: String,
   createdAt: String,
   updatedAt: String
 });

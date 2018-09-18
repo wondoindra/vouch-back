@@ -1,4 +1,5 @@
 const TicketModel = require("../models/ticketissue").TicketModel;
+const LogModel = require("../models/ticketlog").LogModel;
 module.exports = app => {
   app.get("/", (req, res) => {
     res.send("Ticket API");
@@ -23,32 +24,65 @@ module.exports = app => {
           res.status(400).send("Invalid ticket status");
         }
       }
-    );
+    ).sort("-updatedAt");
+  });
+
+  app.get("/logs", (req, res) => {
+    LogModel.find({}, (err, log) => {
+      if (err) return res.send(err);
+      res.json(log);
+    }).sort("-createdAt");
+  });
+
+  app.get("/logs/:ticketid", (req, res) => {
+    LogModel.find(
+      {
+        ticketid: req.params.ticketid
+      },
+      (err, log) => {
+        if (log) {
+          res.json(log);
+        } else {
+          res.status(400).send("No logs found");
+        }
+      }
+    ).sort("-createdAt");
   });
 
   app.post("/ticket/add", (req, res) => {
+    const date = new Date();
+    const newdate = `${date.getDate()}/${date.getMonth() +
+      1}/${date.getFullYear()}`;
     TicketModel.findOne({ name: req.body.name }, (err, ticket) => {
       if (!ticket) {
         const ticket = new TicketModel();
+        const log = new LogModel();
         ticket.name = req.body.name;
+        log.ticketlog = req.body.ticketlog;
         ticket.status = "Open";
-        ticket.logs = req.body.logs;
-        ticket.createdAt = new Date();
-        ticket.updatedAt = new Date();
+        ticket.createdAt = date;
+        log.createdAt = date;
+        ticket.updatedAt = date;
+        log.updatedAt = newdate;
 
         if (ticket.name) {
           ticket.save((err, ticket) => {
             if (err) return res.send(err);
-            res.json({
-              status: "Ticket added",
-              data: ticket
+            log.ticketid = ticket.id;
+            log.save((err, log) => {
+              if (err) return res.send(err);
+              res.json({
+                status: "Ticket added",
+                ticket,
+                log
+              });
             });
           });
         } else {
           res.status(400).send("Please fill ticket name");
         }
       } else {
-        res.status(400).send("This ticket name is taken");
+        res.status(400).send(ticket.id);
       }
     });
   });
@@ -68,15 +102,25 @@ module.exports = app => {
   });
 
   app.put("/ticket/update", (req, res) => {
+    const date = new Date();
+    const newdate = `${date.getDate()}/${date.getMonth() +
+      1}/${date.getFullYear()}`;
     TicketModel.findOne({ name: req.body.name }, (err, ticket) => {
       if (ticket) {
         ticket.status = req.body.status;
-        ticket.logs = req.body.logs;
-        ticket.updatedAt = new Date();
+        ticket.updatedAt = date;
         ticket.save((err, ticket) => {
-          res.json({
-            status: "Ticket updated",
-            data: ticket
+          const log = new LogModel();
+          log.ticketid = ticket.id;
+          log.ticketlog = req.body.ticketlog;
+          log.createdAt = date;
+          log.updatedAt = newdate;
+          log.save((err, log) => {
+            res.json({
+              status: "Ticket updated",
+              ticket,
+              log
+            });
           });
         });
       } else {
