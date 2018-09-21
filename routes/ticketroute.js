@@ -9,7 +9,7 @@ module.exports = app => {
     TicketModel.find({}, (err, ticket) => {
       if (err) return res.send(err);
       res.json(ticket);
-    }).sort("updatedAt");
+    }).sort("-updatedAt");
   });
 
   app.get("/tickets/:status", (req, res) => {
@@ -24,7 +24,7 @@ module.exports = app => {
           res.status(400).send("Invalid ticket status");
         }
       }
-    ).sort("updatedAt");
+    ).sort("-updatedAt");
   });
 
   app.get("/logs", (req, res) => {
