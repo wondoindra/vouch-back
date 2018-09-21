@@ -31,7 +31,7 @@ module.exports = app => {
     LogModel.find({}, (err, log) => {
       if (err) return res.send(err);
       res.json(log);
-    }).sort("createdAt");
+    }).sort("-createdAt");
   });
 
   app.get("/logs/:ticketid", (req, res) => {
@@ -46,7 +46,7 @@ module.exports = app => {
           res.status(400).send("No logs found");
         }
       }
-    ).sort("createdAt");
+    ).sort("-createdAt");
   });
 
   app.post("/ticket/add", (req, res) => {
