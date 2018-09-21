@@ -9,7 +9,7 @@ module.exports = app => {
     TicketModel.find({}, (err, ticket) => {
       if (err) return res.send(err);
       res.json(ticket);
-    }).sort("-createdAt");
+    }).sort("updatedAt");
   });
 
   app.get("/tickets/:status", (req, res) => {
@@ -24,14 +24,14 @@ module.exports = app => {
           res.status(400).send("Invalid ticket status");
         }
       }
-    ).sort("-createdAt");
+    ).sort("updatedAt");
   });
 
   app.get("/logs", (req, res) => {
     LogModel.find({}, (err, log) => {
       if (err) return res.send(err);
       res.json(log);
-    }).sort("-createdAt");
+    }).sort("createdAt");
   });
 
   app.get("/logs/:ticketid", (req, res) => {
@@ -46,15 +46,15 @@ module.exports = app => {
           res.status(400).send("No logs found");
         }
       }
-    ).sort("-createdAt");
+    ).sort("createdAt");
   });
 
   app.post("/ticket/add", (req, res) => {
-    const date = new Date();
-    const newdate = `${date.getDate()}/${date.getMonth() +
-      1}/${date.getFullYear()}`;
     TicketModel.findOne({ name: req.body.name }, (err, ticket) => {
       if (!ticket) {
+        const date = new Date();
+        const newdate = `${date.getDate()}/${date.getMonth() +
+          1}/${date.getFullYear()}`;
         const ticket = new TicketModel();
         const log = new LogModel();
         ticket.name = req.body.name;
@@ -102,11 +102,11 @@ module.exports = app => {
   });
 
   app.put("/ticket/update", (req, res) => {
-    const date = new Date();
-    const newdate = `${date.getDate()}/${date.getMonth() +
-      1}/${date.getFullYear()}`;
     TicketModel.findOne({ name: req.body.name }, (err, ticket) => {
       if (ticket) {
+        const date = new Date();
+        const newdate = `${date.getDate()}/${date.getMonth() +
+          1}/${date.getFullYear()}`;
         ticket.status = req.body.status;
         ticket.updatedAt = date;
         ticket.save((err, ticket) => {
